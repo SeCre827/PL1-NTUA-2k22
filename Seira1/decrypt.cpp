@@ -88,6 +88,7 @@ string decrypt(string message, int shift)
         }
     }
     for (int i = 0; i < 25; i++){
+        // letter times
         if (letter_times[shift][i] != 0){
             letter_times[shift][i] =letter_times[shift][i]/letter_count;
         }
@@ -102,7 +103,6 @@ int main( int argc, char** argv){
     create_dict();
     // string possible_words[26]= {""};
     string possible_words[26];
-    // for (int i = 0; i < 25; i++){ possible_words[i] = "" ;}
 
     // for (int n = 0; n <= 25; n++)
     for (int n = 0; n <= 25; n++)    {
