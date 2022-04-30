@@ -1,0 +1,8 @@
+to run sml
+decrypt "msg0.txt"
+
+to run cpp 
+Compile
+g++ -std=c++11 -Wall -Werror -O3 -o decrypt decrypt.cpp 
+Run
+./decrypt msg0.txt;
