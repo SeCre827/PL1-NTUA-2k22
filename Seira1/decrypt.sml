@@ -56,23 +56,19 @@ local
 
    end
 
-   (*  letterProbs charProbs *)
-
-   (* Get the letter probabilites for the language and the charprobabilities for this text and return the entropy *)
-   fun findEntropy (charProbs:int list) =
-   let
-      fun intToReal l = List.map Real.fromInt l; 
-      fun findEntropyHelper ([]:real list) [] sum = sum 
-      | findEntropyHelper (h1::tl1) (h2::tl2) sum = findEntropyHelper tl1 tl2 ((h1 * h2) + sum)
-      | findEntropyHelper [] (h2::tl2) sum =  sum
-      | findEntropyHelper (h1::tl1) [] sum = sum
-   in
-      findEntropyHelper letterProbs (intToReal(charProbs)) 0.0
-   end 
-   
-   (* for n = 0 print all entropies for ROTN from n= 0 to n =25 and return the array Arr[0] = entropy [0] *)
-   fun findBiggestEntropy list  = 
+   fun findBiggestEntropy list_of_strings  = 
       let
+         (* Get the letter probabilites for the language and the charprobabilities for this text and return the entropy *)
+         fun findEntropy (charProbs:int list) =
+         let
+            fun intToReal l = List.map Real.fromInt l; 
+            fun findEntropyHelper ([]:real list) [] sum = sum 
+            | findEntropyHelper (h1::tl1) (h2::tl2) sum = findEntropyHelper tl1 tl2 ((h1 * h2) + sum)
+            | findEntropyHelper [] (h2::tl2) sum =  sum
+            | findEntropyHelper (h1::tl1) [] sum = sum
+         in
+            findEntropyHelper letterProbs (intToReal(charProbs)) 0.0
+         end 
          fun findAllEntropies list n  =
             if (n <26) then (
                            (findEntropy   (#2(rot2n list n))) :: findAllEntropies list  (n+1)) 
@@ -82,20 +78,26 @@ local
                if (hd > max)  then findIndexOfMax tl hd (index+ step) 1
                else findIndexOfMax tl max (index) (step+1)
       in
-         findIndexOfMax (findAllEntropies list  0) 0.0 0 0
+         findIndexOfMax (findAllEntropies list_of_strings  0) 0.0 0 0
       end
 
-   fun read file =
-   let 
-   val inStream = TextIO.openIn file
-      fun helper(copt: char option) =
-      case copt of
-         NONE => (TextIO.closeIn inStream; [])
-      | SOME(c) => (c :: helper(TextIO.input1 inStream))
-   in
-      helper(TextIO.input1 inStream)
-   end
-   fun decryptWord string  = #1(rot2n string (findBiggestEntropy string ))
+
+   fun decryptWord file  = 
+      let 
+         fun read file =
+         let 
+         val inStream = TextIO.openIn file
+            fun helper(copt: char option) =
+            case copt of
+               NONE => (TextIO.closeIn inStream; [])
+            | SOME(c) => (c :: helper(TextIO.input1 inStream))
+         in
+            helper(TextIO.input1 inStream)
+         end
+         val input = read file
+      in 
+         #1(rot2n input (findBiggestEntropy input ))
+      end
 
    fun printList [] = print("\n")
    |printList (hd::tl) =
@@ -104,7 +106,7 @@ local
 in 
    fun decrypt fileName = 
    let 
-      val k = printList (decryptWord (read fileName))
+      val k = printList (decryptWord fileName)
    in
       k
    end
