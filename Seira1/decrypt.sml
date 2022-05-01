@@ -1,13 +1,8 @@
 local
-      val letterTimes = Array2.array(26,26,0);
-   val entropies =Array.array(26,0);
    val letterProbs =[0.08167, 0.01492, 0.02782, 0.04253, 0.12702, 0.02228, 0.02015,
    0.06094, 0.06966, 0.00153, 0.00772, 0.04025, 0.02406, 0.06749,
    0.07507, 0.01929, 0.00095, 0.05987, 0.06327, 0.09056, 0.02758,
    0.00978, 0.02360, 0.00150, 0.01974, 0.00074 ];
-   val l1 = [1,3,5,6,12]
-   val l2 = [2,5,0,152,1]
-   val l3 = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58]
 
    local
       (* Na ftiaksw mia sinartisi poy na kanei ton pinaka letter times 26 *)
@@ -64,7 +59,7 @@ local
    (*  letterProbs charProbs *)
 
    (* Get the letter probabilites for the language and the charprobabilities for this text and return the entropy *)
-   fun findEntropy (letterProbs:real list) (charProbs:int list) =
+   fun findEntropy (charProbs:int list) =
    let
       fun intToReal l = List.map Real.fromInt l; 
       fun findEntropyHelper ([]:real list) [] sum = sum 
@@ -74,20 +69,20 @@ local
    in
       findEntropyHelper letterProbs (intToReal(charProbs)) 0.0
    end 
-   
+
    (* for n = 0 print all entropies for ROTN from n= 0 to n =25 and return the array Arr[0] = entropy [0] *)
-   fun findBiggestEntropy list letterProbs = 
+   fun findBiggestEntropy list  = 
       let
-         fun findAllEntropies list letterProbs n  =
+         fun findAllEntropies list n  =
             if (n <26) then (
-                           (findEntropy  letterProbs (#2(rot2n list n))) :: findAllEntropies list letterProbs (n+1)) 
+                           (findEntropy   (#2(rot2n list n))) :: findAllEntropies list  (n+1)) 
             else []
          fun findIndexOfMax  ([]:real list) max index step = index
             |findIndexOfMax  (hd::tl) max index step = 
                if (hd > max)  then findIndexOfMax tl hd (index+ step) 1
                else findIndexOfMax tl max (index) (step+1)
       in
-         findIndexOfMax (findAllEntropies list letterProbs 0) 0.0 0 0
+         findIndexOfMax (findAllEntropies list  0) 0.0 0 0
       end
 
    fun read file =
@@ -100,13 +95,18 @@ local
    in
       helper(TextIO.input1 inStream)
    end
-   fun decryptWord string  letterProbs= #1(rot2n string (findBiggestEntropy string letterProbs))
-   fun printList [] = ()
-   |printList (hd::tl) =
-      if (hd = "\\r") then(print("\n"); printList (List.drop(tl,1)))
-      else (print(hd); printList tl)
+   fun decryptWord string  = #1(rot2n string (findBiggestEntropy string ))
 
+   fun printList [] = print("\n")
+   |printList (hd::tl) =
+      if (hd = "\\n") then(print("\n"); (printList tl)) (*Checks for new line*)
+      else (print(hd); printList tl)
 in 
-   fun decrypt fileName = printList (decryptWord (read fileName) letterProbs)
+   fun decrypt fileName = 
+   let 
+      val k = printList (decryptWord (read fileName))
+   in
+      k
+   end
 end
 
