@@ -69,7 +69,7 @@ local
    in
       findEntropyHelper letterProbs (intToReal(charProbs)) 0.0
    end 
-
+   
    (* for n = 0 print all entropies for ROTN from n= 0 to n =25 and return the array Arr[0] = entropy [0] *)
    fun findBiggestEntropy list  = 
       let
